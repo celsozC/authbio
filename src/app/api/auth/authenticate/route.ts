@@ -1,9 +1,24 @@
 import { generateAuthenticationOptions } from '@simplewebauthn/server';
 import { NextRequest, NextResponse } from 'next/server';
 
+// Define the device type
+interface AuthenticatorDevice {
+  credentialID: Uint8Array;
+  credentialPublicKey: Uint8Array;
+  counter: number;
+  transports?: AuthenticatorTransport[];
+}
+
+// Define the user type
+interface User {
+  id: string;
+  username: string;
+  devices: AuthenticatorDevice[];
+}
+
 // You'll need to implement these based on your database setup
-const getUserFromDB = async (username: string) => {
-  // TODO: Fetch user and their authenticator data from your database
+const getUserFromDB = async (username: string): Promise<User | null> => {
+  console.log(`Checking user: ${username}`);
   return {
     id: 'user-unique-id',
     username,
@@ -37,7 +52,7 @@ export async function POST(req: NextRequest) {
       rpID: process.env.WEBAUTHN_RP_ID || 'localhost',
       allowCredentials: user.devices.map(device => ({
         id: device.credentialID,
-        type: 'public-key',
+        type: 'public-key' as const,
         transports: device.transports,
       })),
       userVerification: 'preferred',
