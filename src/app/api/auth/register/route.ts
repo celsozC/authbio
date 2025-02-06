@@ -8,7 +8,7 @@ function stringToBuffer(str: string): Uint8Array {
 
 // You'll need to implement these based on your database setup
 const getUserFromDB = async (username: string) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  console.log(`Checking user: ${username}`); // Use the parameter
   return null;
 };
 

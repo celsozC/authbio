@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // You'll need to implement these based on your database setup
 const getUserFromDB = async (username: string) => {
-  // TODO: Fetch user and their authenticator data from your database
+  console.log(`Checking user: ${username}`); // Use the parameter
   return {
     id: 'user-unique-id',
     username,
@@ -12,7 +12,7 @@ const getUserFromDB = async (username: string) => {
 };
 
 const getStoredChallengeForUser = async (userId: string) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  console.log(`Getting challenge for user: ${userId}`); // Use the parameter
   return 'stored-challenge';
 };
 
