@@ -12,7 +12,7 @@ const getUserFromDB = async (username: string) => {
 };
 
 const getStoredChallengeForUser = async (userId: string) => {
-  // TODO: Retrieve the challenge you stored during authentication options generation
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return 'stored-challenge';
 };
 

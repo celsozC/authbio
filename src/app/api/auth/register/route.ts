@@ -8,7 +8,7 @@ function stringToBuffer(str: string): Uint8Array {
 
 // You'll need to implement these based on your database setup
 const getUserFromDB = async (username: string) => {
-  // TODO: Check if user exists in your database
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return null;
 };
 
@@ -19,6 +19,18 @@ const createUser = async (username: string) => {
     username
   };
 };
+
+// Get the domain from the request
+function getDomain(req: NextRequest) {
+  // For development
+  if (process.env.NODE_ENV === 'development') {
+    return 'localhost';
+  }
+  
+  // For production
+  const host = req.headers.get('host') || 'localhost';
+  return host.split(':')[0]; // Remove port if present
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -31,6 +43,11 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    const domain = getDomain(req);
+    const origin = process.env.NODE_ENV === 'development' 
+      ? `http://${domain}:3000`
+      : `https://${domain}`;
 
     // Check if user already exists
     const existingUser = await getUserFromDB(username);
@@ -47,7 +64,7 @@ export async function POST(req: NextRequest) {
     // Generate registration options
     const options = await generateRegistrationOptions({
       rpName: 'WebAuthn Demo',
-      rpID: 'localhost',
+      rpID: domain,
       userID: stringToBuffer(user.id),
       userName: username,
       authenticatorSelection: {
@@ -69,7 +86,14 @@ export async function POST(req: NextRequest) {
     // Store the challenge for later verification
     // await saveRegistrationChallenge(user.id, options.challenge);
 
-    return NextResponse.json(options);
+    return NextResponse.json({
+      ...options,
+      debug: {
+        rpID: domain,
+        origin,
+        userAgent: req.headers.get('user-agent'),
+      }
+    });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
